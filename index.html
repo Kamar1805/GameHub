@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-menu">
+        <h1>🎮 Welcome to Game Hub 🎮</h1>
+        <p>Select a game to play:</p>
+        <div class="game-list">
+            <button onclick="loadGame('snake')">🐍 Snake</button>
+            <button onclick="loadGame('tic-tac-toe')">❌⭕ <br> Tic-Tac-Toe</button>
+            <button onclick="loadGame('pong')">🏓 Pong</button>
+            <button onclick="loadGame('flappy-bird')">🐦 Flappy Bird</button>
+            <button onclick="loadGame('memory-game')">🃏 Memory Game</button>
+            <button onclick="loadGame('number-guess')">🔢 Number Guess</button>
+            <button onclick="loadGame('rock-paper-scissors')">✊✋✌️ Rock Paper Scissors</button>
+            <button onclick="loadGame('breakout')">🧱 Breakout</button>
+            <button onclick="loadGame('whack-a-mole')">🐹 Whack-a-Mole</button>
+            <button onclick="loadGame('quiz-game')">📝 Quiz Game</button>
+            <button onclick="loadGame('typing-speed')">⌨️ Typing Speed</button>
+            <button onclick="loadGame('hangman')">🔤 Hangman</button>
+            <button onclick="loadGame('simon-says')">🎵 Simon Says</button>
+            <button onclick="loadGame('2048')">🔢 2048</button>
+            <button onclick="loadGame('space-shooter')">🚀 Space Shooter</button>
+        </div>
+    </div>
+    
+    <div id="game-container" style="display: none;">
+        <button id="exit-button" onclick="exitGame()">⬅ Exit Game</button>
+        <iframe id="game-frame" src="" frameborder="0"></iframe>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

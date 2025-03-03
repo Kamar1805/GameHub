@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background: #222; color: white; }
+        canvas { background: black; display: block; margin: auto; }
+        #score { font-size: 20px; }
+        .controls { display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
+        .btn-row { display: flex; }
+        button { 
+            width: 60px; height: 60px; margin: 5px; font-size: 20px; font-weight: bold;
+            background: lime; border: none; border-radius: 10px; cursor: pointer;
+        }
+        button:active { background: green; }
+    </style>
+</head>
+<body>
+    <h1>🐍 Snake Game</h1>
+    <p id="score">Score: 0 | High Score: <span id="high-score">0</span></p>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    
+    <div class="controls">
+        <button ontouchstart="changeDirection(38)">⬆️</button>
+        <div class="btn-row">
+            <button ontouchstart="changeDirection(37)">⬅️</button>
+            <button ontouchstart="changeDirection(40)">⬇️</button>
+            <button ontouchstart="changeDirection(39)">➡️</button>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const box = 20;
+        let snake = [{ x: 10 * box, y: 10 * box }];
+        let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+        let direction = "RIGHT";
+        let nextDirection = "RIGHT";
+        let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
+        document.getElementById("high-score").textContent = highScore;
+        let gameRunning = true;
+        
+        document.addEventListener("keydown", (event) => changeDirection(event.keyCode));
+        
+        function changeDirection(key) {
+            if (key == 37 && direction != "RIGHT") nextDirection = "LEFT";
+            else if (key == 38 && direction != "DOWN") nextDirection = "UP";
+            else if (key == 39 && direction != "LEFT") nextDirection = "RIGHT";
+            else if (key == 40 && direction != "UP") nextDirection = "DOWN";
+        }
+
+        function draw() {
+            if (!gameRunning) return;
+            
+            direction = nextDirection; 
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "red";
+            ctx.fillRect(food.x, food.y, box, box);
+            
+            ctx.fillStyle = "lime";
+            snake.forEach(part => ctx.fillRect(part.x, part.y, box, box));
+            
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+            
+            if (direction == "LEFT") snakeX -= box;
+            if (direction == "UP") snakeY -= box;
+            if (direction == "RIGHT") snakeX += box;
+            if (direction == "DOWN") snakeY += box;
+            
+            if (snakeX == food.x && snakeY == food.y) {
+                score++;
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem("highScore", highScore);
+                }
+                food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+            } else {
+                snake.pop();
+            }
+            
+            let newHead = { x: snakeX, y: snakeY };
+            if (snakeX < 0 || snakeY < 0 || snakeX >= canvas.width || snakeY >= canvas.height || snake.some(part => part.x == newHead.x && part.y == newHead.y)) {
+                alert("Game Over! Score: " + score);
+                gameRunning = false;
+                setTimeout(() => location.reload(), 1000);
+                return;
+            }
+            
+            snake.unshift(newHead);
+            document.getElementById("score").textContent = `Score: ${score} | High Score: ${highScore}`;
+        }
+        setInterval(draw, 100);
+    </script>
+</body>
+</html>
