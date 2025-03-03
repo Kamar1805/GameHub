@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background: #222; color: white; margin: 0; padding: 20px; }
+        h1 { margin-bottom: 10px; }
+        .board { display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 5px; justify-content: center; margin: 20px auto; }
+        .cell {
+            width: 100px; height: 100px; font-size: 2em; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            background: #444; color: white; border: 2px solid white; cursor: pointer;
+        }
+        .cell:hover { background: #666; }
+        #status { font-size: 1.2em; margin: 10px 0; }
+        .btn { padding: 10px 20px; font-size: 1em; margin-top: 10px; cursor: pointer; background: lime; border: none; border-radius: 5px; }
+        .btn:hover { background: green; }
+        
+        @media (max-width: 600px) {
+            .board { grid-template-columns: repeat(3, 80px); }
+            .cell { width: 80px; height: 80px; font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <h1>❌ Tic-Tac-Toe ⭕</h1>
+    <div id="status">Player X's turn</div>
+    <div class="board" id="board"></div>
+    <button class="btn" onclick="resetGame()">Restart Game</button>
+    
+    <script>
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let gameActive = true;
+        const statusDisplay = document.getElementById("status");
+        const boardElement = document.getElementById("board");
+        
+        function renderBoard() {
+            boardElement.innerHTML = "";
+            board.forEach((cell, index) => {
+                const cellElement = document.createElement("div");
+                cellElement.classList.add("cell");
+                cellElement.textContent = cell;
+                cellElement.addEventListener("click", () => handleCellClick(index));
+                boardElement.appendChild(cellElement);
+            });
+        }
+        
+        function handleCellClick(index) {
+            if (board[index] || !gameActive || currentPlayer === "O") return;
+            board[index] = "X";
+            renderBoard();
+            checkWinner();
+            if (gameActive) {
+                currentPlayer = "O";
+                setTimeout(computerMove, 500);
+            }
+        }
+        
+        function computerMove() {
+            let bestMove = minimax(board, "O").index;
+            board[bestMove] = "O";
+            renderBoard();
+            checkWinner();
+            currentPlayer = "X";
+        }
+        
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    gameActive = false;
+                    statusDisplay.textContent = `Player ${board[a]} Wins! 🎉`;
+                    return;
+                }
+            }
+            if (!board.includes("")) {
+                gameActive = false;
+                statusDisplay.textContent = "It's a Draw! 🤝";
+            }
+        }
+        
+        function minimax(newBoard, player) {
+            let availableMoves = newBoard.map((cell, index) => cell === "" ? index : null).filter(index => index !== null);
+            if (checkWin(newBoard, "X")) return { score: -10 };
+            if (checkWin(newBoard, "O")) return { score: 10 };
+            if (availableMoves.length === 0) return { score: 0 };
+            
+            let moves = [];
+            for (let i of availableMoves) {
+                let move = {};
+                move.index = i;
+                newBoard[i] = player;
+                if (player === "O") {
+                    move.score = minimax(newBoard, "X").score;
+                } else {
+                    move.score = minimax(newBoard, "O").score;
+                }
+                newBoard[i] = "";
+                moves.push(move);
+            }
+            
+            let bestMove;
+            if (player === "O") {
+                let bestScore = -Infinity;
+                for (let move of moves) {
+                    if (move.score > bestScore) {
+                        bestScore = move.score;
+                        bestMove = move;
+                    }
+                }
+            } else {
+                let bestScore = Infinity;
+                for (let move of moves) {
+                    if (move.score < bestScore) {
+                        bestScore = move.score;
+                        bestMove = move;
+                    }
+                }
+            }
+            return bestMove;
+        }
+        
+        function checkWin(board, player) {
+            return [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ].some(combination => combination.every(index => board[index] === player));
+        }
+        
+        function resetGame() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "X";
+            gameActive = true;
+            statusDisplay.textContent = "Player X's turn";
+            renderBoard();
+        }
+        
+        renderBoard();
+    </script>
+</body>
+</html>
